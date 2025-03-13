@@ -1,0 +1,35 @@
+name: Update Error Log
+
+on:
+  push:
+  workflow_dispatch:  # 允許手動執行
+  schedule:
+    - cron: "0 * * * *"  # 每小時執行一次
+
+jobs:
+  update-log:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 檢出 Repo
+        uses: actions/checkout@v3
+
+      - name: 🏗 設定 Golang 環境
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20
+
+      - name: 🔧 執行 Golang 程式
+        run: go run main.go || true  # 即使失敗也不影響 workflow
+
+      - name: 📝 檢查是否有變更
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add error.log
+          if git diff --staged --quiet; then
+            echo "⚠ 沒有新錯誤，不需要提交"
+            exit 0
+          fi
+          git commit -m "🔴 更新錯誤日誌 $(date +'%Y-%m-%d %H:%M:%S')"
+          git push
