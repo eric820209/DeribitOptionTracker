@@ -1,11 +1,29 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 )
+
+// Level1Quote 代表 API 回應中的單筆數據
+type Level1Quote struct {
+	Strike              float64 `json:"strike"`
+	ExpirationTimestamp string  `json:"expirationTimestamp"`
+	OpenInterest        int     `json:"openInterest"`
+	OpenInterestUSD     float64 `json:"openInterestUSD"`
+	PutCall             string  `json:"putCall"`
+	Instrument          string  `json:"instrument"`
+}
+
+// APIResponse 代表完整的 API 回應
+type APIResponse struct {
+	Data struct {
+		Level1Quotes []Level1Quote `json:"Level1Quotes"`
+	} `json:"data"`
+}
 
 func main() {
 
@@ -37,8 +55,8 @@ func main() {
 	}
 
 	// 假設這裡要解析 JSON
-	var result map[string]interface{}
-	if err := json.Unmarshal(body, &result); err != nil {
+	var response APIResponse
+	if err := json.Unmarshal(body, &response); err != nil {
 		LogError(err) // 記錄錯誤
 		return
 	}
