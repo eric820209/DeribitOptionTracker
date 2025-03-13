@@ -4,7 +4,7 @@ on:
   push:
   workflow_dispatch:  # 允許手動執行
   schedule:
-    - cron: "0 * * * *"  # 每小時執行一次
+    - cron: "0 8 * * *"  # 每小時執行一次
 
 jobs:
   update-log:
